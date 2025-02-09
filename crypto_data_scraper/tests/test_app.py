@@ -48,7 +48,7 @@ def test_app_render(monkeypatch):
     }
     monkeypatch.setattr('services.fetch_crypto_prices', lambda: (mock_response, "2025-01-01 00:00:00"))
 
-    at = AppTest.from_file("app.py")
+    at = AppTest.from_file("crypto_data_scraper/app.py")
     at.run()
 
     # Debugging: Check what elements are being captured
