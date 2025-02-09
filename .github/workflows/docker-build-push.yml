@@ -1,0 +1,29 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: [self-hosted, purplespacecat-homelab.github-runner]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Log in to Docker Hub
+      run: |
+        echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+    - name: Build Docker Image
+      run: |
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/crypto-price-dashboard:latest .
+
+    - name: Push Docker Image to Docker Hub
+      run: |
+        docker push ${{ secrets.DOCKER_USERNAME }}/crypto-price-dashboard:latest
+
+    - name: Log out from Docker Hub
+      run: docker logout
