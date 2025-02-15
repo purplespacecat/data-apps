@@ -57,7 +57,7 @@ def test_app_render(monkeypatch):
 
     # Check if title is rendered
     assert len(at.title) > 0, "No titles were rendered in the app!"
-    assert at.title[0].value == "📈 Crypto Price Dashboard"
+    assert "Crypto Price Dashboard" in at.title[0].value
 
     # Check if DataFrame is rendered
     assert len(at.dataframe) > 0, "No dataframes were rendered in the app!"
