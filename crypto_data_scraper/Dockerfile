@@ -2,10 +2,10 @@
 FROM python:3.10-slim
 
 # Set the working directory
-WORKDIR /app/crypto_data_scraper
+WORKDIR /app
 
 # Copy only the requirements first to leverage Docker cache for faster builds
-COPY crypto_data_scraper/requirements.txt .
+COPY requirements.txt .
 
 # Create a virtual environment
 RUN python -m venv /opt/venv
@@ -16,11 +16,14 @@ RUN /opt/venv/bin/pip install --no-cache-dir -r requirements.txt
 # Update PATH to use venv by default
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Copy the rest of the application
-COPY crypto_data_scraper/ .
+# Set Python path
+ENV PYTHONPATH=/app
 
-# Run tests using virtual environment
-RUN pytest tests
+# Copy application files
+COPY . .
 
-# If tests pass, run the Streamlit app
+# Expose the Streamlit port
+EXPOSE 8501
+
+# Run the Streamlit app
 CMD ["streamlit", "run", "app.py"]

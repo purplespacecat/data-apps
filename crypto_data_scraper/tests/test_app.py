@@ -12,15 +12,28 @@ import app  # For rendering tests
 
 # Test 1: Check if API fetch function works correctly
 def test_fetch_crypto_prices_success():
-    mock_response = {
+    # Mock current price response
+    mock_price_response = {
         "bitcoin": {"usd": 40000},
         "ethereum": {"usd": 3000}
     }
 
-    with patch('services.requests.get') as mock_get:
-        mock_get.return_value.json.return_value = mock_response
-        mock_get.return_value.raise_for_status = lambda: None  # Simulate no error
+    # Mock historical data response
+    mock_historical_response = {
+        "prices": [
+            [1622505600000, 35000],  # Example timestamp and price
+            [1622592000000, 36000]
+        ]
+    }
 
+    with patch('services.make_request') as mock_request:
+        # Configure mock to return different responses based on URL
+        def mock_response(url, params=None):
+            if 'market_chart' in url:
+                return mock_historical_response
+            return mock_price_response
+
+        mock_request.side_effect = mock_response
         data, timestamp = fetch_crypto_prices()
         assert "bitcoin" in data
         assert data["bitcoin"]["usd"] == 40000
