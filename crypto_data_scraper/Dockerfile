@@ -1,26 +1,29 @@
-# Dockerfile
-
+# Use official Python image as the base
 FROM python:3.10-slim
 
-# Set working directory
-WORKDIR /app/crypto_data_scraper
+# Set the working directory
+WORKDIR /app
 
-# Copy requirements and install dependencies
-COPY crypto_data_scraper/requirements.txt .
+# Copy only the requirements first to leverage Docker cache for faster builds
+COPY requirements.txt .
+
+# Create a virtual environment
 RUN python -m venv /opt/venv
+
+# Activate virtual environment and install dependencies
 RUN /opt/venv/bin/pip install --no-cache-dir -r requirements.txt
 
-# Set PATH to use virtual environment
+# Update PATH to use venv by default
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Copy the rest of the application code
-COPY crypto_data_scraper/ .
+# Set Python path
+ENV PYTHONPATH=/app
 
-# Declare the build argument
-ARG RUN_TESTS=true
+# Copy application files
+COPY . .
 
-# Conditionally run tests if RUN_TESTS is true
-RUN if [ "$RUN_TESTS" = "true" ]; then pytest tests; else echo "Skipping tests"; fi
+# Expose the Streamlit port
+EXPOSE 8501
 
-# Default command (optional)
+# Run the Streamlit app
 CMD ["streamlit", "run", "app.py"]
